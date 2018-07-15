@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Páginas Facebook</title>
+	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+	  window.fbAsyncInit = function() {
+	    FB.init({
+	      appId      : '1223079081166440',
+	      xfbml      : true,
+	      version    : 'v3.0'
+	    });
+	    FB.getLoginStatus(function(response) { //para saber o status do usuário
+    	statusChangeCallback(response);
+});
+	  };
+
+	  (function(d, s, id){
+	     var js, fjs = d.getElementsByTagName(s)[0];
+	     if (d.getElementById(id)) {return;}
+	     js = d.createElement(s); js.id = id;
+	     js.src = "https://connect.facebook.net/en_US/sdk.js";
+	     fjs.parentNode.insertBefore(js, fjs);
+	   }(document, 'script', 'facebook-jssdk'));
+
+	  function statusChangeCallback(response){
+	  	if(response.status === 'connected'){
+	  		console.log("Usuário Autorizado");
+	  		requestAPI();
+	  	}else{
+	  		console.log("Não Autorizado");
+	  	}
+	  }
+		  function checkLoginState() {
+	  FB.getLoginStatus(function(response) {
+	    statusChangeCallback(response);
+	  });
+	}
+
+	function requestAPI(){
+	FB.api('me?fields=id,name,likes.limit(6){picture,fan_count,link,name}', function(response){
+		if(response){
+			console.log(response);
+			percorrepagina(response);	
+		}
+	});
+}
+function percorrepagina(pagina){
+	paginas = document.getElementById('paginas');
+
+	paginas.innerHTML = '';
+	for(var i = 0; i < pagina.likes.data.length; i++){
+		paginas.innerHTML += `
+		<div class="card card-body bg-light">
+			<div class="media">
+			  <div class="media-left">
+			    <a href="#" style='padding:10px'>
+			      <img class="media-object" src="${pagina.likes.data[i].picture.data.url}" alt="...">
+			    </a>
+			  </div>
+			  <div class="media-body">
+			    <h4 class="media-heading">${pagina.likes.data[i].name}</h4>
+			    <p>
+			    Cutidas <span class="badge">${pagina.likes.data[i].fan_count}</span>
+			    </p>
+			  </div>
+			</div>
+		<div>
+		` ;
+
+	}
+}
+</script>
+<fb:login-button scope="public_profile,email, user_likes" onlogin="checkLoginState();">
+</fb:login-button>
+<div class="container">
+	<div id="paginas"></div>
+</div>
+</body>
+</html>
